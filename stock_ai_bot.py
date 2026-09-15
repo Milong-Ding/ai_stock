@@ -64,13 +64,15 @@ def send_line_message(message, access_token, user_id):
         print(f"❌ 發送失敗，錯誤碼：{res.status_code}, 內容：{res.text}")
 
 if __name__ == "__main__":
-    # 優先讀取環境變數（雲端部署用），若無則讀取本地密鑰
-    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "你的_GEMINI_API_KEY")
-    LINE_ACCESS_TOKEN = os.getenv("LINE_ACCESS_TOKEN", "你的_LINE_ACCESS_TOKEN")
-    LINE_USER_ID = os.getenv("LINE_USER_ID", "你的_LINE_USER_ID")
+    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
+    LINE_ACCESS_TOKEN = os.getenv("LINE_ACCESS_TOKEN", "").strip()
+    LINE_USER_ID = os.getenv("LINE_USER_ID", "").strip()
 
-    data_summary = get_stock_data("2330.TW")
-    ai_report = analyze_with_ai(data_summary, GEMINI_API_KEY)
-    
-    final_message = f"{data_summary}\n\n🧠【AI 趨勢與決策建議】\n{ai_report}"
-    send_line_message(final_message, LINE_ACCESS_TOKEN, LINE_USER_ID)
+    # 嚴謹檢查：必須三個 Key 都有值才執行主程式
+    if GEMINI_API_KEY and LINE_ACCESS_TOKEN and LINE_USER_ID:
+        data_summary = get_stock_data("2330.TW")
+        ai_report = analyze_with_ai(data_summary, GEMINI_API_KEY)
+        final_message = f"{data_summary}\n\n🧠【AI 趨勢與決策建議】\n{ai_report}"
+        send_line_message(final_message, LINE_ACCESS_TOKEN, LINE_USER_ID)
+    else:
+        print("💡 提示：未完整偵測到環境變數密鑰，請確認 GEMINI_API_KEY、LINE_ACCESS_TOKEN 與 LINE_USER_ID 是否已設定。")
